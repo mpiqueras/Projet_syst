@@ -1,0 +1,8 @@
+int main() {
+int a,note;
+a=5;
+note=0;
+if (a==5){
+	note=20;
+}
+}

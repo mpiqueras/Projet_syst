@@ -1,0 +1,9 @@
+int main() {
+int a,r;
+a=4;
+if(a==4){
+r=7;
+} else {
+r=9;
+}
+}

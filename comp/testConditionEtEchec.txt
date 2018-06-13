@@ -1,0 +1,10 @@
+int main() {
+int note,UFvalide,joie;
+note=13;
+UFvalide=1;
+joie=0;
+if((note>14)&&(UFvalide==1)){
+joie = 500;
+}
+}
+

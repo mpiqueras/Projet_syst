@@ -1,0 +1,10 @@
+int main(){
+int a,b,m,d,s,p;
+a = 8;
+b = 4;
+m = a * b;
+d = a / b;
+s = a - b;
+p = a + b;
+}
+

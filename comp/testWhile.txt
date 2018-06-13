@@ -1,0 +1,7 @@
+int main() {
+int note;
+note=26;
+while(note>=21){
+note = note-1;
+}
+}

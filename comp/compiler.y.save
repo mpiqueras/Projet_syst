@@ -1,0 +1,117 @@
+%{
+	#include <stdio.h>
+	#include "table_des_symboles.h"
+	int yylex(void);
+	void yyerror(char*);
+	char* type;
+	int depth=0;
+%}
+
+%union {
+	int nb;
+	char* str;
+}
+
+%token tVOID tMAIN tIF tELSE tPRINTF tCONST tINT tFLOAT tSTRING tACCOLADEOUVRANTE tACCOLADEFERMANTE tPARENTHESEOUVRANTE tPARENTHESEFERMANTE tVIRGULE tCONSTANTE tVARIABLE tEGAL tPOINTVIRGULE tNOMBRE tADD tSUB tMUL tDIV tCHAINE tINFEGAL tSUPEGAL tINF tSUP tEGALEGAL tDIFFERENT tOU tET;
+
+%left tADD tSUB
+%left tMUL tDIV
+
+%type <str> tINT tFLOAT tCHAINE tVARIABLE tSTRING tVOID Type
+%type <nb> tNOMBRE Terme Expression
+
+%%
+S: tINT tMAIN tPARENTHESEOUVRANTE Args tPARENTHESEFERMANTE tACCOLADEOUVRANTE Body tACCOLADEFERMANTE;
+
+Type: tINT|tSTRING|tVOID;
+
+Args: ;
+Args: Arg ArgSuite;
+Arg: Type tVARIABLE;
+ArgSuite: tVIRGULE Arg ArgSuite;
+ArgSuite: ;
+Body: Ligne Body ;
+Body: ;
+
+Ligne: Affectation tPOINTVIRGULE;
+Affectation: tVARIABLE tEGAL Terme{
+	//empiler($1,"int",depth,'0');
+	printf("LOAD 0 %d\n", last());
+	depiler();
+	printf("STORE %d 0\n", getAdress($1));
+};
+Affectation: tVARIABLE tEGAL tCHAINE;
+
+Terme: 
+tVARIABLE{
+	empiler("tmp","int",depth,'1');
+	printf("LOAD 0 %d\n",getAdress($1));
+	printf("STORE %d 0\n",last());
+}
+|tNOMBRE{
+	empiler("tmp","int",depth,'1');
+	printf("AFC 0 %d\n",$1);
+	printf("STORE %d 0\n",last());
+}
+|Expression;
+
+//adresse -1 return adresse -> depilage puis return adresse sommet pile (case vide)
+Expression: tPARENTHESEOUVRANTE Expression tPARENTHESEFERMANTE;
+Expression: Terme tADD Terme{
+	printf("LOAD 0 %d\n",last());
+	depiler();
+	printf("LOAD 1 %d\n",last());
+	printf("ADD 0 0 1\n");
+	//empiler("tmp","int",depth,'1');
+	printf("STORE %d 0\n",last());
+}; 
+Expression: Terme tSUB Terme{
+	printf("LOAD 0 %d\n",last());
+	depiler();
+	printf("LOAD 1 %d\n",last());
+	printf("SUB 0 0 1\n");
+	//empiler("tmp","int",depth,'1');
+	printf("STORE %d 0\n",last());
+}; 
+Expression: Terme tMUL Terme{
+	printf("LOAD 0 %d\n",last());
+	depiler();
+	printf("LOAD 1 %d\n",last());
+	printf("MUL 0 0 1\n");
+	//empiler("tmp","int",depth,'1');
+	printf("STORE %d 0\n",last());
+}; 
+Expression: Terme tDIV Terme{
+	printf("LOAD 0 %d\n",last());
+	depiler();
+	printf("LOAD 1 %d\n",last());
+	printf("DIV 0 0 1\n");
+	//empiler("tmp","int",depth,'1');
+	printf("STORE %d 0\n",last());
+}; 
+
+Ligne: Declaration {display_pile();}tPOINTVIRGULE;
+Declaration: Type tVARIABLE {type = $1;empiler($2,type,depth,'0');} DeclarationSuite  ;
+Declaration: tVARIABLE {empiler($1,type,depth,'0');} DeclarationSuite ;
+DeclarationSuite: tVIRGULE Declaration;
+DeclarationSuite: ;
+
+Ligne: tPRINTF tPARENTHESEOUVRANTE tCHAINE tPARENTHESEFERMANTE tPOINTVIRGULE ;
+Ligne: tPRINTF tPARENTHESEOUVRANTE tVARIABLE tPARENTHESEFERMANTE tPOINTVIRGULE;
+
+Ligne: tIF tPARENTHESEOUVRANTE Conditions tPARENTHESEFERMANTE tACCOLADEOUVRANTE Body tACCOLADEFERMANTE tELSE tACCOLADEOUVRANTE Body tACCOLADEFERMANTE ;
+Ligne: tIF tPARENTHESEOUVRANTE Conditions tPARENTHESEFERMANTE tACCOLADEOUVRANTE Body tACCOLADEFERMANTE;
+Conditions: Condition suiteConditions;
+Condition:tINT Comparateur tINT;
+Condition:tINT;
+suiteConditions:;
+suiteConditions: Logique Conditions;
+Comparateur: tINFEGAL|tSUPEGAL|tINF|tSUP|tEGALEGAL|tDIFFERENT;
+Logique: tOU|tET;
+
+
+%%
+int main() {
+	//yydebug=1;
+	yyparse();
+}
