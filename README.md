@@ -1,4 +1,4 @@
 # Projet_syst
 
-# Morgan Girard
-# Mathilde Piqueras
+Morgan Girard
+Mathilde Piqueras
