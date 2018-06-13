@@ -1,0 +1,4 @@
+AFC 0 8 
+STORE 1 0 
+LOAD 0 1 
+STORE 0 0 
